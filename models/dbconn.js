@@ -1,14 +1,11 @@
-const mysql = require('mysql'), // import mysql module
-  dbConfig = require("../db.config.js")
-  cors = require('cors');
-
+const mysql = require('mysql'); // import mysql module
 
 // setup database
 db = mysql.createConnection({
-  host: dbConfig.HOST,
-  user: dbConfig.USER,
-  password: dbConfig.PASSWORD,
-  database: dbConfig.DB
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
 });
 
 db.connect(error => {

@@ -4,6 +4,7 @@ const express = require('express'),
       bodyParser = require('body-parser');
 
 require('mysql');
+require('dotenv').config();
 
 //https://www.youtube.com/watch?v=dDjzTDN3cy8&t=4184s&ab_channel=HamzaMirza
 
