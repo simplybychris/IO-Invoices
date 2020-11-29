@@ -6,10 +6,6 @@ const express = require('express'),
 require('mysql');
 require('dotenv').config();
 
-//https://www.youtube.com/watch?v=dDjzTDN3cy8&t=4184s&ab_channel=HamzaMirza
-
-// run modules
-// app.use(cors());
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json());   
 

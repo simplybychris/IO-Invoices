@@ -1,15 +1,5 @@
 const Customer = require("../models/customer.model.js");
 
-// function getCustomerFromRec(req) {
-//     const Customer = {
-        
-//     };
-
-//     return Customer;
-// }
-
-//https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/routes
-
 exports.findAll = (req, res) => {
   Customer.getAll((err, data) => {
     if (err)
@@ -21,39 +11,80 @@ exports.findAll = (req, res) => {
   });
 };
 
-exports.customer_detail = function (req, res) {
-    let sql = `SELECT * FROM customer where id=${req.params.id}`;
-    db.query(sql, function (err, data, fields) {
-        if (err) throw err;
-        if (!data.length) {
-            res.status(404).json({
-                message: "Customer not found"
-            })
-        } else {
-            res.json({
-                status: 200,
-                data,
-                message: "Customer retrieved successfully"
-            })
-        }
-    })
+exports.findOne = (req, res) => {
+  Customer.getById(req.params.id, (err, data) => {
+    if (err) {
+      if (err.error === "Customer not found") {
+        res.status(404).send({
+          message: `Not found Customer with id: ${req.params.id}.`
+        });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving Customer with id: " + req.params.id
+        });
+      }
+    } else res.send(data);
+  });
 };
 
-exports.customer_create_post = function (req, res) {
-    let sql = `INSERT INTO customer(first_name, last_name, email, address, brand_name, nip) VALUES (?)`;
-    let values = [
-        req.body.first_name,
-        req.body.last_name,
-        req.body.email,
-        req.body.address,
-        req.body.brand_name,
-        req.body.nip
-    ];
-    db.query(sql, [values], function (err, data, fields) {
-        if (err) throw err;
-        res.json({
-            status: 200,
-            message: "New customer added successfully"
-        })
-    })
+exports.create = function (req, res) {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Values can not be empty!"
+    });
+  }
+
+  const customer = new Customer({
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    email: req.body.email,
+    address: req.body.address,
+    brand_name: req.body.brand_name,
+    nip: req.body.nip
+  });
+
+  Customer.create(customer, (err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Error adding Customer."
+      });
+    else res.send(data);
+  });
+};
+
+exports.update = function (req, res) {
+  Customer.updateById(
+    req.params.id,
+    new Customer(req.body),
+    (err, data) => {
+      if (err) {
+        if (err.error === "Customer not found") {
+          res.status(404).send({
+            message: `Not found Customer with id: ${req.params.id}.`
+          });
+        } else {
+          res.status(500).send({
+            message: "Error updating Customer with id: " + req.params.id
+          });
+        }
+      } else res.send(data);
+    }
+  );
+};
+
+exports.delete = function (req, res) {
+  Customer.delete(req.params.id, (err, data) => {
+    if (err) {
+      if (err.error === "Customer not found") {
+        res.status(404).send({
+          message: `Not found Customer with id: ${req.params.id}.`
+        });
+      } else {
+        res.status(500).send({
+          message: "Could not delete Customer with id: " + req.params.id
+        });
+      }
+    } else res.send({ message: `Customer deleted successfully!` });
+  });
 };
