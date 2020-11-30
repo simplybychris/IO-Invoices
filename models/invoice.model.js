@@ -1,7 +1,7 @@
 const sql = require("./dbconn.js");
 
 const Invoice = function (invoice) {
-    this.customer_id = customer_id,
+    this.customer_id = invoice.customer_id,
     this.seller_id = invoice.seller_id,
     this.invoice_position_id = invoice.invoice_position_id,
     this.invoice_date = invoice.invoice_date,
