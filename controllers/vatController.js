@@ -35,9 +35,7 @@ exports.create = function (req, res) {
   }
 
   const vat = new Vat({
-    vat_id: req.body.vat_id,
-    name: req.body.name,
-    price: req.body.price
+    number: req.body.number
   });
 
   Vat.create(vat, (err, data) => {
