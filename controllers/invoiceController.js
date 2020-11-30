@@ -35,7 +35,7 @@ exports.create = function (req, res) {
   }
 
   const invoice = new Invoice({
-    customer_id: req.body.id,
+    customer_id: req.body.customer_id,
     seller_id: req.body.seller_id,
     invoice_position_id: req.body.invoice_position_id,
     invoice_date: req.body.invoice_date,
