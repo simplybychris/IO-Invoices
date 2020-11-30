@@ -52,8 +52,8 @@ Vat.create = (newVat, result) => {
 };
 
 Vat.updateById = (id, vat, result) => {
-  sql.query("UPDATE vat SET vat_id=?, name=?, price=? WHERE id=?",
-    [vat.vat_id, vat.name, vat.price, id],
+  sql.query("UPDATE vat SET number=? WHERE id=?",
+    [vat.number, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);
