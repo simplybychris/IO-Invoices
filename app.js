@@ -14,12 +14,14 @@ const customersRouter = require('./routes/customer.routes');
 const sellerRouter = require('./routes/seller.routes');
 const invoicesRouter = require('./routes/invoice.routes');
 const productsRouter = require('./routes/product.routes');
+const vatRouter = require('./routes/vat.routes');
 
 // use router
 app.use('/customers', customersRouter);
 app.use('/sellers', sellerRouter);
 app.use('/invoices', invoicesRouter);
 app.use('/products', productsRouter);
+app.use('/vat', vatRouter);
 
 
 
