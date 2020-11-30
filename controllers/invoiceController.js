@@ -35,12 +35,13 @@ exports.create = function (req, res) {
   }
 
   const invoice = new Invoice({
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    email: req.body.email,
-    address: req.body.address,
-    brand_name: req.body.brand_name,
-    nip: req.body.nip
+    customer_id: req.body.id,
+    seller_id: req.body.seller_id,
+    invoice_position_id: req.body.invoice_position_id,
+    invoice_date: req.body.invoice_date,
+    due_date: req.body.due_date,
+    invoice_status_id: req.body.invoice_status_id,
+    total: req.body.total
   });
 
   Invoice.create(invoice, (err, data) => {
