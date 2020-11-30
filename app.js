@@ -21,7 +21,7 @@ app.use('/customers', customersRouter);
 app.use('/sellers', sellerRouter);
 app.use('/invoices', invoicesRouter);
 app.use('/products', productsRouter);
-app.use('/vat', vatRouter);
+app.use('/vats', vatRouter);
 
 
 
