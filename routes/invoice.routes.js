@@ -1,6 +1,6 @@
 const express = require('express'),
   router = express.Router(),
-  invoiceController = require('../controllers/invoiceController');
+  invoiceController = require('../controllers/invoice.controller');
 
 // get all invoices
 router.get('/', invoiceController.findAll);
@@ -8,8 +8,11 @@ router.get('/', invoiceController.findAll);
 // get invoice by id
 router.get('/:id', invoiceController.findOne);
 
-// create new user
+// create new invoice
 router.post('/', invoiceController.create);
+
+// new invoice method
+router.post('/add', invoiceController.add);
 
 // update invoice by id
 router.put('/:id', invoiceController.update);

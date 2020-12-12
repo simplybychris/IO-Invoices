@@ -35,10 +35,11 @@ exports.create = function (req, res) {
   }
 
   const invoice_position = new Invoice_position({
+    invoice_id: req.body.invoice_id,
     name: req.body.name,
     product_id: req.body.product_id,
     quantity: req.body.quantity,
-    netto: req.body.netto,
+    unit_price: req.body.unit_price,
     total: req.body.total
   });
 
@@ -53,9 +54,15 @@ exports.create = function (req, res) {
 };
 
 exports.update = function (req, res) {
+
+  const invoice_position = new Invoice_position({
+    invoice_id: req.params.id,
+    quantity: req.body.quantity,
+  });
+
   Invoice_position.updateById(
     req.params.id,
-    new Invoice_position(req.body),
+    invoice_position,
     (err, data) => {
       if (err) {
         if (err.error === "Invoice_position not found") {

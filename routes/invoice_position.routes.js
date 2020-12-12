@@ -1,6 +1,6 @@
 const express = require('express'),
   router = express.Router(),
-  invoice_positionController = require('../controllers/invoice_positionController');
+  invoice_positionController = require('../controllers/invoice_position.controller.js');
 
 // get all invoice_positions
 router.get('/', invoice_positionController.findAll);

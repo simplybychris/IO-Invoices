@@ -1,6 +1,6 @@
 const express = require('express'),
   router = express.Router(),
-  sellerController = require('../controllers/sellerController');
+  sellerController = require('../controllers/seller.controller.js');
 
 // get all sellers
 router.get('/', sellerController.findAll);

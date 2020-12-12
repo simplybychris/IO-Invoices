@@ -1,6 +1,6 @@
 const express = require('express'),
   router = express.Router(),
-  vatController = require('../controllers/vatController');
+  vatController = require('../controllers/vat.controller.js');
 
 // get all vats
 router.get('/', vatController.findAll);

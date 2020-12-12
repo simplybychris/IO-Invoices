@@ -12,15 +12,15 @@ exports.findAll = (req, res) => {
 };
 
 exports.findOne = (req, res) => {
-  Customer.getById(req.params.id, (err, data) => {
+  Customer.getByNip(req.params.nip, (err, data) => {
     if (err) {
       if (err.error === "Customer not found") {
         res.status(404).send({
-          message: `Not found Customer with id: ${req.params.id}.`
+          message: `Not found Customer with nip: ${req.params.nip}.`
         });
       } else {
         res.status(500).send({
-          message: "Error retrieving Customer with id: " + req.params.id
+          message: "Error retrieving Customer with nip: " + req.params.nip
         });
       }
     } else res.send(data);

@@ -1,10 +1,11 @@
 const sql = require("./dbconn.js");
 
 const Invoice_position = function (invoice_position) {
-  this.name = invoice_position.name,
+  this.invoice_id = invoice_position.invoice_id,
+    this.name = invoice_position.name,
     this.product_id = invoice_position.product_id,
     this.quantity = invoice_position.quantity,
-    this.netto = invoice_position.netto,
+    this.unit_price = invoice_position.unit_price,
     this.total = invoice_position.total
 };
 
@@ -28,7 +29,7 @@ Invoice_position.getById = function (id, result) {
     }
 
     if (res.length <= 0) {
-      result({error: "Invoice_position not found"}, null);
+      result({ error: "Invoice_position not found" }, null);
       return;
     }
 
@@ -54,34 +55,43 @@ Invoice_position.create = (newInvoice_position, result) => {
 };
 
 Invoice_position.updateById = (id, invoice_position, result) => {
-  sql.query("UPDATE invoice_position SET name=?, product_id=?, quantity=?, netto=?, total=? WHERE id=?",
-    [invoice_position.name, invoice_position.product_id, invoice_position.quantity, invoice_position.netto, invoice_position.total, id],
-    (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
+  sql.query("SELECT * FROM invoice_position WHERE id='" + id + "'", (err, res1) => {
+    sql.query("UPDATE invoice_position SET quantity=?, total=? WHERE id=?",
+      [invoice_position.quantity, invoice_position.quantity * res1[0].unit_price, id],
+      (err, res) => {
+        if (err) {
+          console.log("error: ", err);[]
+          result(null, err);
+          return;
+        }
 
-      if (res.affectedRows == 0) {
-        result({ error: "Invoice_position not found" }, null);
-        return;
-      }
+        if (res.affectedRows == 0) {
+          result({ error: "Invoice_position not found" }, null);
+          return;
+        }
 
-      console.log("updated invoice_position: ", { id: id, ...invoice_position });
-      result(null, { id: id, ...invoice_position });
-    });
+        console.log("updated invoice_position: ", { id: id, ...invoice_position });
+        result(null, { id: id, ...invoice_position });
+      });
+    //res1[0].invoice_id
+    sql.query("UPDATE invoice SET total=(SELECT SUM(invoice_position.total) as total FROM invoice_position WHERE invoice_position.invoice_id = '"
+      + res1[0].invoice_id + "') WHERE invoice.id = '" + res1[0].invoice_id + "'");
+  });
 };
 
 Invoice_position.delete = (id, result) => {
-  sql.query("DELETE FROM invoice_position WHERE id = ?", [id], (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(err, null);
-      return;
-    }
-    console.log("Deleted invoice_position with id: ", id);
-    result(null, res);
+  sql.query("SELECT * FROM invoice_position WHERE id='" + id + "'", (err, res1) => {
+    sql.query("DELETE FROM invoice_position WHERE id = ?", [id], (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+      console.log("Deleted invoice_position with id: ", id);
+      result(null, res);
+    });
+    sql.query("UPDATE invoice SET total=(SELECT SUM(invoice_position.total) as total FROM invoice_position WHERE invoice_position.invoice_id = '"
+      + res1[0].invoice_id + "') WHERE invoice.id = '" + res1[0].invoice_id + "'");
   });
 };
 

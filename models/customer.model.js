@@ -42,6 +42,26 @@ Customer.getById = function (id, result) {
   });
 };
 
+Customer.getByNip = function (nip, result) {
+  sql.query("SELECT * FROM customer where nip = ?", nip, function (err, res) {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+
+    if (res.length <= 0) {
+      err = "Customer cannot be null";
+      result({ error: "Customer not found" }, null);
+      return;
+    }
+
+    console.log("Found customer: ", res[0]);
+    result(null, res[0]);
+    return;
+  });
+};
+
 Customer.create = (newCustomer, result) => {
   sql.query("INSERT INTO customer SET ?", newCustomer, (err, res) => {
     if (err) {

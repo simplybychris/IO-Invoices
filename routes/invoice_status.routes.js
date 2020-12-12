@@ -1,6 +1,6 @@
 const express = require('express'),
   router = express.Router(),
-  invoice_statusController = require('../controllers/invoice_statusController');
+  invoice_statusController = require('../controllers/invoice_status.controller.js');
 
 // get all invoice_statuses
 router.get('/', invoice_statusController.findAll);

@@ -2,8 +2,8 @@ const sql = require("./dbconn.js");
 
 const Product = function (product) {
   this.vat_id = product.vat_id,
-  this.name = product.name,
-  this.price = product.price
+    this.name = product.name,
+    this.price = product.price
 };
 
 Product.getAll = result => {
@@ -28,7 +28,7 @@ Product.getById = function (id, result) {
     }
 
     if (res.length <= 0) {
-      result({error: "Product not found"}, null);
+      result({ error: "Product not found" }, null);
       return;
     }
 
@@ -41,8 +41,28 @@ Product.getById = function (id, result) {
   });
 };
 
+Product.checkIfExists = function (product, result) {
+  sql.query("SELECT * FROM product where name = '"+product.name+"' AND price = "+product.price, function (err, res) {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+
+    if (res.length <= 0) {
+      err = "Product cannot be null";
+      result({ error: "Product not found" }, null);
+      return;
+    }
+
+    console.log("Found product: ", res[0].id);
+    result(null, res[0].id);
+    return;
+  });
+};
+
 Product.create = (newProduct, result) => {
-  sql.query("INSERT INTO product SET ?", newProduct, (err, res) => {
+  sql.query("INSERT INTO product(vat_id, name, price) VALUES ("+newProduct.vat_id+",'"+newProduct.name+"',"+newProduct.price+")", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);

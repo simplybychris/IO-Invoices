@@ -1,13 +1,12 @@
 const sql = require("./dbconn.js");
 
 const Invoice = function (invoice) {
-    this.customer_id = invoice.customer_id,
-    this.seller_id = invoice.seller_id,
-    this.invoice_position_id = invoice.invoice_position_id,
-    this.invoice_date = invoice.invoice_date,
-    this.due_date = invoice.due_date,
-    this.invoice_status_id = invoice.invoice_status_id,
-    this.total = invoice.total
+  this.customer_id = invoice.customer_id,
+  this.seller_id = invoice.seller_id,
+  this.invoice_status_id = invoice.invoice_status_id,
+  this.invoice_date = invoice.invoice_date,
+  this.due_date = invoice.due_date,
+  this.total = invoice.total
 };
 
 Invoice.getAll = result => {
@@ -56,8 +55,8 @@ Invoice.create = (newInvoice, result) => {
 };
 
 Invoice.updateById = (id, invoice, result) => {
-  sql.query("UPDATE invoice SET customer_id=?, seller_id=?, invoice_position_id=?, invoice_date=?, due_date=?, invoice_status_id=?, total=? WHERE id=?",
-    [invoice.customer_id, invoice.seller_id, invoice.invoice_position_id, invoice.invoice_date, invoice.due_date, invoice.invoice_status_id, invoice.total, id],
+  sql.query("UPDATE invoice SET customer_id=?, seller_id=?, invoice_date=?, due_date=?, invoice_status_id=?, total=? WHERE id=?",
+    [invoice.customer_id, invoice.seller_id, invoice.invoice_date, invoice.due_date, invoice.invoice_status_id, invoice.total, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);

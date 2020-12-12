@@ -26,7 +26,7 @@ Vat.getById = function (id, result) {
     }
 
     if (res.length <= 0) {
-      result({error: "Vat not found"}, null);
+      result({ error: `Vat with number: ${req.body.number} not found` }, null);
       return;
     }
 
@@ -39,8 +39,28 @@ Vat.getById = function (id, result) {
   });
 };
 
+Vat.checkNumber = function (number, result) {
+  sql.query("SELECT * FROM vat where number = ?", number, function (err, res) {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+
+    if (res.length <= 0) {
+      err = "Vat cannot be null";
+      result({ error: "Vat not found" }, null);
+      return;
+    }
+
+    console.log("Found vat: ", res[0].id);
+    result(null, res[0].id);
+    return;
+  });
+};
+
 Vat.create = (newVat, result) => {
-  sql.query("INSERT INTO vat SET ?", newVat, (err, res) => {
+  sql.query("INSERT INTO vat (number) VALUES ("+newVat+")", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
