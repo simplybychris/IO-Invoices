@@ -1,15 +1,15 @@
 const sql = require("./dbconn.js");
 
 const Invoice = function (invoice) {
-  this.customer_id = invoice.customer_id,
-  this.seller_id = invoice.seller_id,
-  this.invoice_status_id = invoice.invoice_status_id,
-  this.invoice_date = invoice.invoice_date,
-  this.due_date = invoice.due_date,
-  this.total = invoice.total
+  (this.customer_id = invoice.customer_id),
+    (this.seller_id = invoice.seller_id),
+    (this.invoice_status_id = invoice.invoice_status_id),
+    (this.invoice_date = invoice.invoice_date),
+    (this.due_date = invoice.due_date),
+    (this.total = invoice.total);
 };
 
-Invoice.getAll = result => {
+Invoice.getAll = (result) => {
   sql.query("SELECT * FROM invoice", (err, res) => {
     if (err) {
       console.log("error: ", err);
@@ -18,6 +18,27 @@ Invoice.getAll = result => {
     console.log("invoices: ", res);
     result(null, res);
   });
+};
+
+Invoice.getAllVue = (result) => {
+  sql.query(
+    "SELECT invoice.id, first_name, last_name, invoice_date, due_date, total, invoice_status_id FROM invoice INNER JOIN customer ON customer.id = invoice.customer_id",
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ error: "Invoice_position not found" }, null);
+        return;
+      }
+
+      result(null, res);
+    }
+    //res1[0].invoice_id
+  );
 };
 
 Invoice.getById = function (id, result) {
@@ -29,13 +50,12 @@ Invoice.getById = function (id, result) {
     }
 
     if (res.length <= 0) {
-      result({error: "Invoice not found"}, null);
+      result({ error: "Invoice not found" }, null);
       return;
     }
 
     console.log("Found invoice: ", res[0]);
     result(null, res[0]);
-
 
     console.log("invoice: ", res);
     result(null, res);
@@ -55,8 +75,17 @@ Invoice.create = (newInvoice, result) => {
 };
 
 Invoice.updateById = (id, invoice, result) => {
-  sql.query("UPDATE invoice SET customer_id=?, seller_id=?, invoice_date=?, due_date=?, invoice_status_id=?, total=? WHERE id=?",
-    [invoice.customer_id, invoice.seller_id, invoice.invoice_date, invoice.due_date, invoice.invoice_status_id, invoice.total, id],
+  sql.query(
+    "UPDATE invoice SET customer_id=?, seller_id=?, invoice_date=?, due_date=?, invoice_status_id=?, total=? WHERE id=?",
+    [
+      invoice.customer_id,
+      invoice.seller_id,
+      invoice.invoice_date,
+      invoice.due_date,
+      invoice.invoice_status_id,
+      invoice.total,
+      id,
+    ],
     (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -71,7 +100,8 @@ Invoice.updateById = (id, invoice, result) => {
 
       console.log("updated invoice: ", { id: id, ...invoice });
       result(null, { id: id, ...invoice });
-    });
+    }
+  );
 };
 
 Invoice.delete = (id, result) => {

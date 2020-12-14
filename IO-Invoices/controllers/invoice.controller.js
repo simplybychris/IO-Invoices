@@ -4,7 +4,7 @@ const Invoice = require("../models/invoice.model.js");
 const Customer = require("../models/customer.model.js");
 const Product = require("../models/product.model.js");
 const Invoice_position = require("../models/invoice_position.model.js");
-const util = require('util');
+const util = require("util");
 const checkNumberPromisified = util.promisify(Vat.checkNumber);
 const createVat = util.promisify(Vat.create);
 const checkIfProductExists = util.promisify(Product.checkIfExists);
@@ -14,14 +14,31 @@ const createCustomer = util.promisify(Customer.create);
 const createInvoice = util.promisify(Invoice.create);
 const checkIfCustomerExists = util.promisify(Customer.getByNip);
 
-exports.findAll = (req, res) => {
+exports.findAll = (req, res, next) => {
   Invoice.getAll((err, data) => {
     if (err)
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving invoices."
+          err.message || "Some error occurred while retrieving invoices.",
       });
-    else res.send(data);
+    else {
+      console.log(data);
+      res.send(data);
+    }
+  });
+};
+
+exports.findAllVue = (req, res, next) => {
+  Invoice.getAllVue((err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving invoices.",
+      });
+    else {
+      console.log(data);
+      res.send(data);
+    }
   });
 };
 
@@ -30,11 +47,11 @@ exports.findOne = (req, res) => {
     if (err) {
       if (err.error === "Invoice not found") {
         res.status(404).send({
-          message: `Not found Invoice with id: ${req.params.id}.`
+          message: `Not found Invoice with id: ${req.params.id}.`,
         });
       } else {
         res.status(500).send({
-          message: "Error retrieving Invoice with id: " + req.params.id
+          message: "Error retrieving Invoice with id: " + req.params.id,
         });
       }
     } else res.send(data);
@@ -45,7 +62,7 @@ exports.findOne = (req, res) => {
 exports.create = function (req, res) {
   if (!req.body) {
     res.status(400).send({
-      message: "Values can not be empty!"
+      message: "Values can not be empty!",
     });
   }
 
@@ -55,14 +72,13 @@ exports.create = function (req, res) {
     invoice_date: req.body.invoice_date,
     due_date: req.body.due_date,
     invoice_status_id: req.body.invoice_status_id,
-    total: req.body.total
+    total: req.body.total,
   });
 
   Invoice.create(invoice, (err, data) => {
     if (err)
       res.status(500).send({
-        message:
-          err.message || "Error adding Invoice."
+        message: err.message || "Error adding Invoice.",
       });
     else res.send(data);
   });
@@ -75,7 +91,7 @@ exports.create = function (req, res) {
 exports.add = async function (req, res) {
   if (!req.body) {
     res.status(400).send({
-      message: "Values can not be empty!"
+      message: "Values can not be empty!",
     });
   }
 
@@ -84,23 +100,21 @@ exports.add = async function (req, res) {
   const customerArr = req.body.customer;
   let productList = [];
   let n = 0;
-  for (let product of productArr) { //iterate through products
-    console.log("petla nr: ",n);
+  for (let product of productArr) {
+    //iterate through products
+    console.log("petla nr: ", n);
     n++;
 
     //check if product'sv at exists in vat table, if not add new
     let checkedVatId = null;
     try {
-
       checkedVatId = await checkNumberPromisified(product.vat);
       //vat not found, create new vat and assign product with this vat_id
-        console.log("not found");
+      console.log("not found");
 
-        //create vat
-        
+      //create vat
 
-
-        console.log("result vat: ", checkedVatId);
+      console.log("result vat: ", checkedVatId);
     } catch (err) {
       console.error(err);
       let data = await createVat(product.vat);
@@ -113,20 +127,19 @@ exports.add = async function (req, res) {
       let id = await checkIfProductExists(product);
       console.log("result product: ", id);
 
-        console.log("product found");
+      console.log("product found");
 
-        let productJSON = {
-          product_id: id,
-          vat_id: checkedVatId,
-          name: product.name,
-          price: product.price,
-          quantity: product.quantity
-        };
+      let productJSON = {
+        product_id: id,
+        vat_id: checkedVatId,
+        name: product.name,
+        price: product.price,
+        quantity: product.quantity,
+      };
 
-
-        //store product list and their quantity to use later in sql query
-        productList.push(productJSON);
-        console.log(productList);
+      //store product list and their quantity to use later in sql query
+      productList.push(productJSON);
+      console.log(productList);
       // finish this iteration
 
       //vat not found, create new vat and assign product with this vat_id
@@ -135,7 +148,7 @@ exports.add = async function (req, res) {
       const productObj = new Product({
         vat_id: checkedVatId,
         name: product.name,
-        price: product.price
+        price: product.price,
       });
 
       //add new product to db
@@ -148,9 +161,8 @@ exports.add = async function (req, res) {
         vat_id: checkedVatId,
         name: product.name,
         price: product.price,
-        quantity: product.quantity
+        quantity: product.quantity,
       };
-
 
       productList.push(productJSON);
       console.log(productList);
@@ -173,12 +185,11 @@ exports.add = async function (req, res) {
   //creating customer
   try {
     console.log("customer nip: ", customerArr.nip);
-    customer = await checkIfCustomerExists(customerArr.nip);
-    console.log("result customer: ", customer);
-    customerId = customer.id;
-    
+    customerObj = await checkIfCustomerExists(customerArr.nip);
+    console.log("result customer: ", customerObj);
+    customerId = customerObj.id;
   } catch (err) {
-    console.error("error customer: ",err);
+    console.error("error customer: ", err);
     console.log("customer not found");
 
     const customer = new Customer({
@@ -187,11 +198,14 @@ exports.add = async function (req, res) {
       email: customerArr.email,
       address: customerArr.address,
       brand_name: customerArr.brand_name,
-      nip: customerArr.nip
+      nip: customerArr.nip,
     });
+    console.log(customerArr.nip);
+
+    console.log(customer);
 
     //create customer
-    customerObj = await createCustomer(customerArr);
+    customerObj = await createCustomer(customer);
     customerId = customerObj.id;
   }
 
@@ -206,14 +220,13 @@ exports.add = async function (req, res) {
     invoice_date: req.body.invoice_date,
     due_date: req.body.due_date,
     invoice_status_id: 1,
-    total: total_cost
+    total: total_cost,
   });
 
   const invoiceObj = await createInvoice(invoice);
   console.log("invoice Object after add: ", invoiceObj);
   //add positions to invoice
   for (let product of productList) {
-
     // W PRODUCT JEST TO!!!!!!!
     // let productJSON = {
     //   product_id: id,
@@ -229,13 +242,19 @@ exports.add = async function (req, res) {
       product_id: product.product_id,
       quantity: product.quantity,
       unit_price: product.price,
-      total: product.quantity * product.price
+      total: product.quantity * product.price,
     });
 
     //adding invoice to db
     const invoicePosObj = await createInvoicePos(invoice_position);
 
-    console.log("invoice pos id: ", invoicePosObj.id, " with product: ", product.name, " added");
+    console.log(
+      "invoice pos id: ",
+      invoicePosObj.id,
+      " with product: ",
+      product.name,
+      " added"
+    );
     // let id = await createInvoicePos([arr]);
 
     // const invoice_position = new Invoice_position({
@@ -249,29 +268,23 @@ exports.add = async function (req, res) {
     // position_id.push(id);
   }
 
-
-  res.status(200).send("Invoice successfully added")
-  
-}
+  res.status(200).send("Invoice successfully added");
+};
 
 exports.update = function (req, res) {
-  Invoice.updateById(
-    req.params.id,
-    new Invoice(req.body),
-    (err, data) => {
-      if (err) {
-        if (err.error === "Invoice not found") {
-          res.status(404).send({
-            message: `Not found Invoice with id: ${req.params.id}.`
-          });
-        } else {
-          res.status(500).send({
-            message: "Error updating Invoice with id: " + req.params.id
-          });
-        }
-      } else res.send(data);
-    }
-  );
+  Invoice.updateById(req.params.id, new Invoice(req.body), (err, data) => {
+    if (err) {
+      if (err.error === "Invoice not found") {
+        res.status(404).send({
+          message: `Not found Invoice with id: ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error updating Invoice with id: " + req.params.id,
+        });
+      }
+    } else res.send(data);
+  });
 };
 
 exports.delete = function (req, res) {
@@ -279,11 +292,11 @@ exports.delete = function (req, res) {
     if (err) {
       if (err.error === "Invoice not found") {
         res.status(404).send({
-          message: `Not found Invoice with id: ${req.params.id}.`
+          message: `Not found Invoice with id: ${req.params.id}.`,
         });
       } else {
         res.status(500).send({
-          message: "Could not delete Invoice with id: " + req.params.id
+          message: "Could not delete Invoice with id: " + req.params.id,
         });
       }
     } else res.send({ message: `Invoice deleted successfully!` });
