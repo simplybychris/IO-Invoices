@@ -17,6 +17,9 @@ router.post("/add", invoiceController.add);
 // update invoice by id
 router.put("/:id", invoiceController.update);
 
+// update invoice status by id
+router.put("/:invoice_id/status/:status_id", invoiceController.updateStatus);
+
 // delete invoice by id
 router.delete("/:id", invoiceController.delete);
 

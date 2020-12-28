@@ -43,22 +43,25 @@ Invoice.getAllVue = (result) => {
 
 Invoice.getById = function (id, result) {
   sql.query("SELECT * FROM invoice where id = ?", id, function (err, res) {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
-    }
+    sql.query(
+      "SELECT * FROM invoice_position WHERE invoice_id='" + id + "'",
+      function (err, res2) {
+        if (err) {
+          console.log("error: ", err);
+          result(null, err);
+          return;
+        }
 
-    if (res.length <= 0) {
-      result({ error: "Invoice not found" }, null);
-      return;
-    }
+        if (res.length <= 0) {
+          result({ error: "Invoice not found" }, null);
+          return;
+        }
 
-    console.log("Found invoice: ", res[0]);
-    result(null, res[0]);
-
-    console.log("invoice: ", res);
-    result(null, res);
+        console.log("invoice: ", res);
+        res[0].products;
+        result(null, { ...res[0], products: res2 });
+      }
+    );
   });
 };
 
@@ -100,6 +103,32 @@ Invoice.updateById = (id, invoice, result) => {
 
       console.log("updated invoice: ", { id: id, ...invoice });
       result(null, { id: id, ...invoice });
+    }
+  );
+};
+
+Invoice.updateStatusById = (status_id, invoice_id, result) => {
+  sql.query(
+    "UPDATE invoice SET invoice_status_id=? WHERE id=?",
+    [status_id, invoice_id],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ error: "Invoice not found" }, null);
+        return;
+      }
+
+      console.log("updated invoice: ", { id: invoice_id });
+      result(null, {
+        message: "Status successfully updated",
+        id: invoice_id,
+        status_id: status_id,
+      });
     }
   );
 };

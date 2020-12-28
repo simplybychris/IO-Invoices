@@ -30,13 +30,12 @@ exports.findAll = (req, res, next) => {
 
 exports.findAllVue = (req, res, next) => {
   Invoice.getAllVue((err, data) => {
-    if (err)
+    if (err) {
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving invoices.",
       });
-    else {
-      console.log(data);
+    } else {
       res.send(data);
     }
   });
@@ -54,7 +53,7 @@ exports.findOne = (req, res) => {
           message: "Error retrieving Invoice with id: " + req.params.id,
         });
       }
-    } else res.send(data);
+    } else res.status(200).send(data);
   });
 };
 
@@ -285,6 +284,26 @@ exports.update = function (req, res) {
       }
     } else res.send(data);
   });
+};
+
+exports.updateStatus = function (req, res) {
+  Invoice.updateStatusById(
+    req.params.status_id,
+    req.params.invoice_id,
+    (err, data) => {
+      if (err) {
+        if (err.error === "Invoice not found") {
+          res.status(404).send({
+            message: `Not found Status with id: ${req.params.id}.`,
+          });
+        } else {
+          res.status(500).send({
+            message: "Error updating Invoice with id: " + req.params.id,
+          });
+        }
+      } else res.send(data);
+    }
+  );
 };
 
 exports.delete = function (req, res) {
