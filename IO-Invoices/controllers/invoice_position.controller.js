@@ -5,7 +5,8 @@ exports.findAll = (req, res) => {
     if (err)
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving invoice_positions."
+          err.message ||
+          "Some error occurred while retrieving invoice_positions.",
       });
     else res.send(data);
   });
@@ -16,11 +17,12 @@ exports.findOne = (req, res) => {
     if (err) {
       if (err.error === "Invoice_position not found") {
         res.status(404).send({
-          message: `Not found Invoice_position with id: ${req.params.id}.`
+          message: `Not found Invoice_position with id: ${req.params.id}.`,
         });
       } else {
         res.status(500).send({
-          message: "Error retrieving Invoice_position with id: " + req.params.id
+          message:
+            "Error retrieving Invoice_position with id: " + req.params.id,
         });
       }
     } else res.send(data);
@@ -30,7 +32,7 @@ exports.findOne = (req, res) => {
 exports.create = function (req, res) {
   if (!req.body) {
     res.status(400).send({
-      message: "Values can not be empty!"
+      message: "Values can not be empty!",
     });
   }
 
@@ -40,43 +42,37 @@ exports.create = function (req, res) {
     product_id: req.body.product_id,
     quantity: req.body.quantity,
     unit_price: req.body.unit_price,
-    total: req.body.total
+    total: req.body.total,
   });
 
   Invoice_position.create(invoice_position, (err, data) => {
     if (err)
       res.status(500).send({
-        message:
-          err.message || "Error adding Invoice_position."
+        message: err.message || "Error adding Invoice_position.",
       });
     else res.send(data);
   });
 };
 
 exports.update = function (req, res) {
-
   const invoice_position = new Invoice_position({
     invoice_id: req.params.id,
     quantity: req.body.quantity,
   });
 
-  Invoice_position.updateById(
-    req.params.id,
-    invoice_position,
-    (err, data) => {
-      if (err) {
-        if (err.error === "Invoice_position not found") {
-          res.status(404).send({
-            message: `Not found Invoice_position with id: ${req.params.id}.`
-          });
-        } else {
-          res.status(500).send({
-            message: "Error updating Invoice_position with id: " + req.params.id
-          });
-        }
-      } else res.send(data);
-    }
-  );
+  Invoice_position.updateById(req.params.id, invoice_position, (err, data) => {
+    if (err) {
+      if (err.error === "Invoice_position not found") {
+        res.status(404).send({
+          message: `Not found Invoice_position with id: ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error updating Invoice_position with id: " + req.params.id,
+        });
+      }
+    } else res.send(data);
+  });
 };
 
 exports.delete = function (req, res) {
@@ -84,11 +80,12 @@ exports.delete = function (req, res) {
     if (err) {
       if (err.error === "Invoice_position not found") {
         res.status(404).send({
-          message: `Not found Invoice_position with id: ${req.params.id}.`
+          message: `Not found Invoice_position with id: ${req.params.id}.`,
         });
       } else {
         res.status(500).send({
-          message: "Could not delete Invoice_position with id: " + req.params.id
+          message:
+            "Could not delete Invoice_position with id: " + req.params.id,
         });
       }
     } else res.send({ message: `Invoice_position deleted successfully!` });

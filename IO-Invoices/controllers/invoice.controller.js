@@ -41,6 +41,29 @@ exports.findAllVue = (req, res, next) => {
   });
 };
 
+exports.getInvoicesIntegrate = (req, res, next) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Values can not be empty!",
+    });
+  }
+  Invoice.integrationInvoices(
+    req.body.nip,
+    req.body.date_from,
+    req.body.date_to,
+    (err, data) => {
+      if (err) {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving invoices.",
+        });
+      } else {
+        res.send(data);
+      }
+    }
+  );
+};
+
 exports.findOne = (req, res) => {
   Invoice.getById(req.params.id, (err, data) => {
     if (err) {
@@ -226,15 +249,6 @@ exports.add = async function (req, res) {
   console.log("invoice Object after add: ", invoiceObj);
   //add positions to invoice
   for (let product of productList) {
-    // W PRODUCT JEST TO!!!!!!!
-    // let productJSON = {
-    //   product_id: id,
-    //   vat_id: checkedVatId,
-    //   name: product.name,
-    //   price: product.price,
-    //   quantity: product.quantity
-    // };
-
     const invoice_position = new Invoice_position({
       invoice_id: invoiceObj.id,
       name: product.name,

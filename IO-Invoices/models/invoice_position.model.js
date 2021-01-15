@@ -59,6 +59,14 @@ Invoice_position.create = (newInvoice_position, result) => {
       result(null, { id: res.insertId, ...newInvoice_position });
     }
   );
+
+  sql.query(
+    "UPDATE invoice SET total=(SELECT SUM(invoice_position.total) as total FROM invoice_position WHERE invoice_position.invoice_id = '" +
+      newInvoice_position.invoice_id +
+      "') WHERE invoice.id = '" +
+      newInvoice_position.invoice_id +
+      "'"
+  );
 };
 
 Invoice_position.updateById = (id, invoice_position, result) => {

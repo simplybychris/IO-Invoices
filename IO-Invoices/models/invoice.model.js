@@ -37,7 +37,26 @@ Invoice.getAllVue = (result) => {
 
       result(null, res);
     }
-    //res1[0].invoice_id
+  );
+};
+
+Invoice.integrationInvoices = function (nip, date, due_date, result) {
+  sql.query(
+    `SELECT invoice.id, invoice.invoice_number, nip, invoice_status.name as 'invoice_status', invoice_date, due_date, total FROM invoice INNER JOIN customer ON customer.id = invoice.customer_id INNER JOIN invoice_status ON  invoice_status.id = invoice.invoice_status_id WHERE nip='${nip}' AND invoice_date >= '${date}' AND due_date <= '${due_date}'`,
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ error: "Invoice_position not found" }, null);
+        return;
+      }
+
+      result(null, res);
+    }
   );
 };
 

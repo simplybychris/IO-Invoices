@@ -11,6 +11,9 @@ router.get("/:id", invoiceController.findOne);
 // create new invoice
 router.post("/", invoiceController.create);
 
+// get invoices integration
+router.post("/invoicesIntegrate", invoiceController.getInvoicesIntegrate);
+
 // new invoice method
 router.post("/add", invoiceController.add);
 
