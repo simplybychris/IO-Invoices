@@ -310,7 +310,7 @@ export default {
                     key: 'invoice_date',
                     label: 'Invoice date',
                     sortable: true,
-                    formatter: (value) => {
+                    formatter: value => {
                         return moment(value).format('DD-MM-YYYY')
                     },
                 },
@@ -323,7 +323,7 @@ export default {
                     sortable: true,
                     // sortByFormatted: true,
                     // filterByFormatted: true,
-                    formatter: (value) => {
+                    formatter: value => {
                         return moment(value).format('DD-MM-YYYY')
                     },
                 },
@@ -335,7 +335,7 @@ export default {
                 {
                     key: 'invoice_status_id',
                     label: 'Status',
-                    formatter: (value) => {
+                    formatter: value => {
                         if (value === 1) {
                             return 'Pending'
                         }
@@ -371,8 +371,8 @@ export default {
         sortOptions() {
             // Create an options list from our fields
             return this.fields
-                .filter((f) => f.sortable)
-                .map((f) => {
+                .filter(f => f.sortable)
+                .map(f => {
                     return { text: f.label, value: f.key }
                 })
         },
@@ -399,7 +399,7 @@ export default {
             console.log(res.data)
             let customersList = res.data
 
-            this.customers = customersList.map((item) => {
+            this.customers = customersList.map(item => {
                 let obj = {}
                 obj['value'] = item
                 obj['text'] = item.first_name + ' ' + item.last_name
@@ -426,12 +426,12 @@ export default {
                     invoice_status_id: 1,
                     total: 0,
                 })
-                .then((response) => {
+                .then(response => {
                     // redirect to new invoice
                     console.log(response.data.id)
                     this.$router.push({ path: '/edit/' + response.data.id })
                 })
-                .catch(function (error) {
+                .catch(function(error) {
                     console.log(error)
                 })
         },
@@ -452,10 +452,10 @@ export default {
                     footerClass: 'p-2 border-top-0',
                     centered: true,
                 })
-                .then((value) => {
+                .then(value => {
                     this.boxTwo = value
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.log(err)
                 })
         },
@@ -475,15 +475,15 @@ export default {
                 const request_url = console.log(request_url, id)
                 axios
                     .delete('http://localhost:4040/invoices/' + id)
-                    .then((response) => {
+                    .then(response => {
                         // Logic to delete local state
                         const invoiceIndex = this.items.findIndex(
-                            (n) => n.id === id
+                            n => n.id === id
                         )
                         this.items.splice(invoiceIndex, 1)
                         return response
                     })
-                    .catch(function (error) {
+                    .catch(function(error) {
                         console.log(error)
                     })
                 this.showMsgBoxTwo()

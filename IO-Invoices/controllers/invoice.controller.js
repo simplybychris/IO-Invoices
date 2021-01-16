@@ -6,6 +6,7 @@ const Product = require("../models/product.model.js");
 const Invoice_position = require("../models/invoice_position.model.js");
 const util = require("util");
 const checkNumberPromisified = util.promisify(Vat.checkNumber);
+const checkMaxId = util.promisify(Invoice.getMaxId);
 const createVat = util.promisify(Vat.create);
 const checkIfProductExists = util.promisify(Product.checkIfExists);
 const createInvoicePos = util.promisify(Invoice_position.create);
@@ -16,6 +17,20 @@ const checkIfCustomerExists = util.promisify(Customer.getByNip);
 
 exports.findAll = (req, res, next) => {
   Invoice.getAll((err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving invoices.",
+      });
+    else {
+      console.log(data);
+      res.send(data);
+    }
+  });
+};
+
+exports.getMaxId = (req, res) => {
+  Invoice.getMaxId((err, data) => {
     if (err)
       res.status(500).send({
         message:
@@ -41,7 +56,7 @@ exports.findAllVue = (req, res, next) => {
   });
 };
 
-exports.getInvoicesIntegrate = (req, res, next) => {
+exports.getInvoicesIntegrate = (req, res) => {
   if (!req.body) {
     res.status(400).send({
       message: "Values can not be empty!",
@@ -80,32 +95,6 @@ exports.findOne = (req, res) => {
   });
 };
 
-//method with rigid values, adding only invoice record
-exports.create = function (req, res) {
-  if (!req.body) {
-    res.status(400).send({
-      message: "Values can not be empty!",
-    });
-  }
-
-  const invoice = new Invoice({
-    customer_id: req.body.customer_id,
-    seller_id: req.body.seller_id,
-    invoice_date: req.body.invoice_date,
-    due_date: req.body.due_date,
-    invoice_status_id: req.body.invoice_status_id,
-    total: req.body.total,
-  });
-
-  Invoice.create(invoice, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message: err.message || "Error adding Invoice.",
-      });
-    else res.send(data);
-  });
-};
-
 //method using json with invoice date, customer, products,
 //adding invoice_position, invoice, products
 // czy przy wprowadzaniu produktow w jsonie maja one przy okazji byc wprowadzane do naszej
@@ -127,7 +116,7 @@ exports.add = async function (req, res) {
     console.log("petla nr: ", n);
     n++;
 
-    //check if product'sv at exists in vat table, if not add new
+    //check if product's vat exists in vat table, if not add new
     let checkedVatId = null;
     try {
       checkedVatId = await checkNumberPromisified(product.vat);
@@ -191,18 +180,6 @@ exports.add = async function (req, res) {
     }
   }
 
-  //dodawanie produktow do bazy loop iteracja
-  //dodanie powiazania pomiedzy invoice_position
-
-  //iterate through productList array and add products
-  // let sqlArray = [];
-  // for (let i = 0; i < productList.length; i++){
-  //   let arr = [productList[i].vat,productList[i].name,productList[i].price]
-  //   sqlArray.push(arr);
-  // };
-
-  console.log("udalo sie! \n ", productList);
-
   let customerObj = null;
   //creating customer
   try {
@@ -236,7 +213,14 @@ exports.add = async function (req, res) {
     return prev + cur.price * cur.quantity;
   }, 0);
 
+  const invoiceid = await checkMaxId();
+  const nextInvoiceId = invoiceid.id + 1;
+  var today = new Date();
+  var yr = today.getFullYear().toString();
+  const invoice_number = nextInvoiceId.toString() + "/" + yr;
+
   const invoice = new Invoice({
+    invoice_number: String(invoice_number),
     customer_id: customerId,
     seller_id: 1,
     invoice_date: req.body.invoice_date,
@@ -268,17 +252,6 @@ exports.add = async function (req, res) {
       product.name,
       " added"
     );
-    // let id = await createInvoicePos([arr]);
-
-    // const invoice_position = new Invoice_position({
-    //   invoice_id: invoice_position,
-    //   name: req.body.name,
-    //   product_id: req.body.product_id,
-    //   quantity: req.body.quantity,
-    //   unit_price: req.b,
-    //   total: req.body.total
-    // });
-    // position_id.push(id);
   }
 
   res.status(200).send("Invoice successfully added");

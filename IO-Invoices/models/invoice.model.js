@@ -1,7 +1,8 @@
 const sql = require("./dbconn.js");
 
 const Invoice = function (invoice) {
-  (this.customer_id = invoice.customer_id),
+  (this.invoice_number = invoice.invoice_number),
+    (this.customer_id = invoice.customer_id),
     (this.seller_id = invoice.seller_id),
     (this.invoice_status_id = invoice.invoice_status_id),
     (this.invoice_date = invoice.invoice_date),
@@ -58,6 +59,25 @@ Invoice.integrationInvoices = function (nip, date, due_date, result) {
       result(null, res);
     }
   );
+};
+
+Invoice.getMaxId = function (result) {
+  sql.query("SELECT MAX(id) AS id FROM invoice", function (err, res) {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+
+    if (res.length <= 0) {
+      result({ error: "Invoice not found" }, null);
+      return;
+    }
+
+    console.log("invoice: ", res);
+    res[0];
+    result(null, { ...res[0] });
+  });
 };
 
 Invoice.getById = function (id, result) {

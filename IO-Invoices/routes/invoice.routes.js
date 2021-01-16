@@ -8,8 +8,7 @@ router.get("/", invoiceController.findAllVue);
 // get invoice by id
 router.get("/:id", invoiceController.findOne);
 
-// create new invoice
-router.post("/", invoiceController.create);
+router.get("/invoice/getMaxId", invoiceController.getMaxId);
 
 // get invoices integration
 router.post("/invoicesIntegrate", invoiceController.getInvoicesIntegrate);
