@@ -121,6 +121,14 @@
         >
             Add product
         </b-button>
+        <b-button
+            variant="primary"
+            class="ml-3"
+            size="sm"
+            @click="$bvModal.show('bv-modal-status')"
+        >
+            Change status
+        </b-button>
         <!-- Modal div -->
 
         <b-modal id="bv-modal-example" hide-footer>
@@ -174,6 +182,31 @@
                 <!-- $bvModal.hide('bv-modal-example') -->
             </b-button>
         </b-modal>
+
+        <b-modal id="bv-modal-status" hide-footer>
+            <template #modal-title> Change status </template>
+            <div class="d-block text-center"></div>
+            <b-form>
+                <b-form-group
+                    id="input-group-2"
+                    label="Status:"
+                    v-model="selectedStatus"
+                    label-for="input-2"
+                >
+                    <div>
+                        <b-form-select
+                            v-model="selectedStatus"
+                            :options="statuses"
+                        ></b-form-select>
+                    </div>
+                </b-form-group>
+            </b-form>
+            <b-button class="mt-3" block @click="changeStatus()"
+                >Add Position
+
+                <!-- $bvModal.hide('bv-modal-example') -->
+            </b-button>
+        </b-modal>
     </b-container>
 </template>
 <script>
@@ -183,8 +216,11 @@ export default {
         return {
             userRow: null,
             selectedProduct: { name: '' },
+            selectedStatus: '',
             quantity: null,
             products: [],
+            statuses: [],
+            options: ['paid', 'pending', 'canceled'],
             items: [],
             fields: [
                 {
@@ -253,6 +289,22 @@ export default {
             let productsList = res.data
 
             this.products = productsList.map((item) => {
+                let obj = {}
+                obj['value'] = item
+                obj['text'] = item.name
+                return obj
+            })
+        } catch (e) {
+            console.error(e)
+        }
+
+        try {
+            const res = await axios.get(
+                'http://localhost:4040/invoice_statuses'
+            )
+            let statusesList = res.data
+
+            this.statuses = statusesList.map((item) => {
                 let obj = {}
                 obj['value'] = item
                 obj['text'] = item.name
@@ -340,6 +392,29 @@ export default {
                     // redirect to new invoice
                     console.log(response.data.id)
                     this.$router.go(this.$router.currentRoute)
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
+        },
+        async changeStatus() {
+            console.log('selectedStatus id = ', this.selectedStatus.id)
+            console.log('id = ', this.$route.params.id)
+            await axios
+                .put(
+                    'http://localhost:4040/invoices/' +
+                        this.$route.params.id +
+                        '/status/' +
+                        this.selectedStatus.id
+                )
+                .then((response) => {
+                    if (this.selectedStatus.id != 1) {
+                        this.$router.push({
+                            name: 'Invoices',
+                        })
+                    } else {
+                        this.$router.go(this.$router.currentRoute)
+                    }
                 })
                 .catch(function (error) {
                     console.log(error)
