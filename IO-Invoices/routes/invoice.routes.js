@@ -16,6 +16,9 @@ router.post("/invoicesIntegrate", invoiceController.getInvoicesIntegrate);
 // new invoice method
 router.post("/add", invoiceController.add);
 
+// add invoice manually
+router.post("/", invoiceController.create);
+
 // update invoice by id
 router.put("/:id", invoiceController.update);
 

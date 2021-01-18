@@ -155,7 +155,7 @@ export default {
         },
     },
     mounted() {
-        this.$root.$on('edit-invoice', (data) => {
+        this.$root.$on('edit-invoice', data => {
             this.user = data
             this.user.isEdit = true
             this.submitted = false

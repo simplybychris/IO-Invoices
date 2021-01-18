@@ -257,6 +257,31 @@ exports.add = async function (req, res) {
   res.status(200).send("Invoice successfully added");
 };
 
+exports.create = function (req, res) {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Values can not be empty!",
+    });
+  }
+
+  const invoice = new Invoice({
+    customer_id: req.body.customer_id,
+    seller_id: req.body.seller_id,
+    invoice_date: req.body.invoice_date,
+    due_date: req.body.due_date,
+    invoice_status_id: req.body.invoice_status_id,
+    total: req.body.total,
+  });
+
+  Invoice.create(invoice, (err, data) => {
+    if (err)
+      res.status(500).send({
+        message: err.message || "Error adding Invoice.",
+      });
+    else res.send(data);
+  });
+};
+
 exports.update = function (req, res) {
   Invoice.updateById(req.params.id, new Invoice(req.body), (err, data) => {
     if (err) {

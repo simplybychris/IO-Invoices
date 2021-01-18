@@ -169,9 +169,11 @@
                 <template v-slot:cell(name)="data">
                     <!-- `data.value` is the value after formatted by the Formatter -->
                     <a
-                        :href="`#${data.value
-                            .replace(/[^a-z]+/i, '-')
-                            .toLowerCase()}`"
+                        :href="
+                            `#${data.value
+                                .replace(/[^a-z]+/i, '-')
+                                .toLowerCase()}`
+                        "
                         >{{ data.value }}</a
                     >
                 </template>
@@ -246,8 +248,8 @@ export default {
         sortOptions() {
             // Create an options list from our fields
             return this.fields
-                .filter((f) => f.sortable)
-                .map((f) => {
+                .filter(f => f.sortable)
+                .map(f => {
                     return { text: f.label, value: f.key }
                 })
         },
@@ -258,7 +260,7 @@ export default {
     watch: {
         bindListEmployees: {
             deep: true,
-            handler: function (list) {
+            handler: function(list) {
                 this.totalRows = list.length
             },
         },
@@ -294,14 +296,14 @@ export default {
                         centered: true,
                     }
                 )
-                .then((value) => {
+                .then(value => {
                     if (value) {
                         this.$store.dispatch('deleteStoreEmployee', {
                             employee: employee,
                         }) // dispatch store action
                     }
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.log('err', err)
                     // An error occurred
                 })
